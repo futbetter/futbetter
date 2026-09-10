@@ -57,8 +57,8 @@ function CategoryPill({ label, href, active }: { label: string; href: string; ac
   return (
     <a
       href={href}
-      className={`rounded-full border px-3 py-1.5 text-xs font-semibold ${
-        active ? "border-brand bg-brand/10 text-brand" : "border-border text-muted hover:border-brand/50"
+      className={`tag transition ${
+        active ? "tag-brand" : "hover:border-brand/50 hover:text-brand"
       }`}
     >
       {label}

@@ -28,19 +28,16 @@ export function HeaderClient({ siteName }: { siteName?: string }) {
           href="https://stake.com/?c=bo4ixMU7"
           target="_blank"
           rel="noopener sponsored"
-          className="hidden items-center gap-1.5 rounded-md bg-[#00e701] px-3.5 py-1.5 text-xs font-black uppercase tracking-wider text-black transition hover:bg-[#00c901] sm:inline-flex"
+          className="btn-angled-primary hidden !py-1.5 !text-xs !bg-[#00e701] !text-black hover:!brightness-110 sm:inline-flex"
         >
-          Stake ↗
+          STAKE ↗
         </a>
 
         {status === "authenticated" && session.user ? (
           <div className="hidden items-center gap-3 sm:flex">
             {isStaff && (
-              <Link
-                href="/admin"
-                className="flex items-center gap-1 rounded-md bg-surface-2 px-3 py-1.5 text-xs font-semibold text-brand"
-              >
-                <ShieldCheck size={14} /> Admin
+              <Link href="/admin" className="tag flex items-center gap-1 text-brand">
+                <ShieldCheck size={13} /> Admin
               </Link>
             )}
             <Link
@@ -64,11 +61,8 @@ export function HeaderClient({ siteName }: { siteName?: string }) {
             </button>
           </div>
         ) : (
-          <Link
-            href="/login"
-            className="hidden rounded-md bg-brand px-4 py-1.5 text-sm font-bold text-black transition hover:bg-brand-dark sm:block"
-          >
-            Login
+          <Link href="/login" className="btn-angled hidden !py-1.5 !text-xs sm:inline-flex">
+            LOGIN
           </Link>
         )}
 
@@ -100,9 +94,9 @@ export function HeaderClient({ siteName }: { siteName?: string }) {
               target="_blank"
               rel="noopener sponsored"
               onClick={() => setOpen(false)}
-              className="my-1 rounded-md bg-[#00e701] px-3 py-2.5 text-center text-sm font-black uppercase tracking-wider text-black"
+              className="btn-angled-primary my-1 w-full justify-center !py-2.5 !text-sm !bg-[#00e701] !text-black"
             >
-              Bet on Stake ↗
+              BET ON STAKE ↗
             </a>
             {status === "authenticated" && session.user ? (
               <>
@@ -133,7 +127,7 @@ export function HeaderClient({ siteName }: { siteName?: string }) {
               <Link
                 href="/login"
                 onClick={() => setOpen(false)}
-                className="rounded-md bg-brand px-3 py-2.5 text-center text-sm font-bold text-black"
+                className="btn-angled justify-center text-center"
               >
                 Login with Telegram
               </Link>

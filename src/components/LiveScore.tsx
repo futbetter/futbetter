@@ -75,13 +75,13 @@ export function LiveScore({
   return (
     <div className="relative flex flex-col items-center gap-1">
       {toast && (
-        <div className="absolute -top-9 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap rounded-full bg-brand px-3 py-1 text-[11px] font-bold text-black shadow-[0_6px_20px_-6px_rgba(34,197,94,0.7)]">
+        <div className="tag tag-brand absolute -top-9 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap glow-brand">
           ⚽ GOAL! {toast.team === "HOME" ? homeTeamName : awayTeamName} {toast.minute}&apos;
         </div>
       )}
 
       <span
-        className={`rounded-lg px-2 py-0.5 font-black tabular-nums transition ${
+        className={`score-num rounded-lg px-2 py-0.5 transition ${
           big ? "text-4xl" : "text-xl"
         } ${flashing ? "goal-flash goal-pop" : ""}`}
       >

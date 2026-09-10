@@ -19,8 +19,8 @@ export default async function MatchesPage() {
       <LiveRefresher active={hasLive} />
       <h1 className="mb-6 text-3xl font-black">Matches</h1>
 
-      <h2 className="mb-4 flex items-center gap-2 text-lg font-bold text-brand">
-        <span className="h-3.5 w-1 rounded-full bg-brand" /> Upcoming
+      <h2 className="mb-4 flex items-center gap-2.5 text-lg font-black italic text-brand">
+        <span className="section-bar" /> Upcoming
       </h2>
       <div className="mb-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {upcoming.map((m) => (
@@ -31,8 +31,8 @@ export default async function MatchesPage() {
 
       {finished.length > 0 && (
         <>
-          <h2 className="mb-4 flex items-center gap-2 text-lg font-bold text-muted">
-            <span className="h-3.5 w-1 rounded-full bg-border-strong" /> Recent Results
+          <h2 className="mb-4 flex items-center gap-2.5 text-lg font-black italic text-muted">
+            <span className="section-bar" style={{ background: "var(--border-strong)" }} /> Recent Results
           </h2>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {finished.map((m) => (

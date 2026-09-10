@@ -56,17 +56,15 @@ export function PredictionBox({
       </div>
 
       {predictionWinner && (
-        <div className="card overflow-hidden border-gold/40">
-          <div className="accent-strip" style={{ background: "linear-gradient(90deg, var(--gold), var(--gold-dark))" }} />
-          <div className="p-4">
+        <div className="card relative overflow-hidden glow-gold border-gold/40">
+          <span className="corner-wedge" style={{ background: "linear-gradient(135deg, var(--gold), var(--gold-dark))" }} />
+          <div className="p-4 pt-5">
             <div className="mb-3 flex items-center justify-between">
               <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-gold">
                 <TrendingUp size={14} /> FutBetter Prediction
               </div>
               {predictionConfidence != null && (
-                <span className="rounded-full bg-gold px-2.5 py-0.5 text-xs font-black text-black">
-                  {predictionConfidence}%
-                </span>
+                <span className="tag tag-gold">{predictionConfidence}%</span>
               )}
             </div>
             <p className="text-lg font-black">
@@ -102,11 +100,7 @@ export function PredictionBox({
             <span className="text-xs font-bold uppercase tracking-wider text-muted">
               Expert Prediction {expertName ? `— ${expertName}` : ""}
             </span>
-            {expertConfidence != null && (
-              <span className="rounded-full bg-surface-2 px-2.5 py-0.5 text-xs font-bold">
-                {expertConfidence}%
-              </span>
-            )}
+            {expertConfidence != null && <span className="tag">{expertConfidence}%</span>}
           </div>
           <p className="text-sm font-bold">{winnerLabel(expertWinner, homeTeamName, awayTeamName)}</p>
         </div>
@@ -116,7 +110,7 @@ export function PredictionBox({
         href="https://stake.com/?c=bo4ixMU7"
         target="_blank"
         rel="noopener sponsored"
-        className="group block rounded-xl border border-[#00e701]/30 bg-gradient-to-br from-surface to-surface-2 p-4 transition hover:border-[#00e701] hover:shadow-[0_0_20px_rgba(0,231,1,0.15)]"
+        className="card card-hover group block border-[#00e701]/30 p-4 transition hover:border-[#00e701]"
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-[#00e701]">

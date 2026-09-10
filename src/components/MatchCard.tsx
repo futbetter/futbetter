@@ -26,17 +26,16 @@ export function MatchCard({ match }: { match: MatchCardData }) {
   return (
     <Link
       href={`/match/${match.slug}`}
-      className={`card card-hover group flex flex-col gap-3 p-4 ${live ? "live-border" : ""}`}
+      className={`card card-hover group relative flex flex-col gap-3 p-4 pt-5 ${live ? "live-border" : ""}`}
     >
+      {(live || match.isMatchOfTheDay) && <span className={`corner-wedge ${live ? "is-live" : ""}`} />}
+
       <div className="flex items-center justify-between gap-2">
         <span className="truncate text-[11px] font-bold uppercase tracking-wider text-muted transition group-hover:text-brand">
           {match.competitionName ?? "Football"}
         </span>
-        {match.isMatchOfTheDay && (
-          <span className="shrink-0 rounded-full bg-gold/15 px-2 py-0.5 text-[10px] font-bold text-gold">
-            ★ MOTD
-          </span>
-        )}
+        {match.isMatchOfTheDay && !live && <span className="tag tag-gold shrink-0">★ MOTD</span>}
+        {live && <span className="tag tag-live shrink-0">● LIVE</span>}
       </div>
 
       <div className="grid grid-cols-3 items-center gap-2 text-center">
@@ -68,13 +67,13 @@ export function MatchCard({ match }: { match: MatchCardData }) {
       <div className="flex items-center justify-between border-t border-border pt-3">
         <span className="text-[11px] text-muted">{formatKickoff(kickoff)}</span>
         <span
-          className={`rounded-md px-3 py-1 text-[11px] font-bold transition ${
+          className={`tag transition ${
             finished
-              ? "border border-border text-muted group-hover:border-brand/50 group-hover:text-brand"
-              : "bg-brand text-black group-hover:bg-brand-dark"
+              ? "text-muted group-hover:text-brand"
+              : "tag-brand"
           }`}
         >
-          {finished ? "VIEW RESULT" : "PREDICT"}
+          {finished ? "VIEW RESULT" : "PREDICT →"}
         </span>
       </div>
     </Link>

@@ -98,9 +98,9 @@ export default async function MatchPage({
         <span>{match.homeTeam.name} vs {match.awayTeam.name}</span>
       </nav>
 
-      <div className={`card overflow-hidden ${live ? "live-border" : ""}`}>
-        <div className="accent-strip" />
-        <div className="p-6">
+      <div className={`card pitch-texture relative overflow-hidden ${live ? "live-border" : "glow-brand"}`}>
+        <span className={`corner-wedge ${live ? "is-live" : ""}`} />
+        <div className="p-6 pt-8">
           <div className="mb-4 flex items-center justify-between text-xs font-bold uppercase tracking-widest text-gold">
             <span>{match.competition?.name ?? "Football"}</span>
             {!live && !finished && <Countdown target={match.kickoffAt.toString()} />}
@@ -151,7 +151,7 @@ export default async function MatchPage({
               href="https://stake.com/?c=bo4ixMU7"
               target="_blank"
               rel="noopener sponsored"
-              className="flex items-center gap-2 rounded-lg bg-[#00e701] px-4 py-2 text-xs font-black uppercase tracking-wider text-black transition hover:bg-[#00c901]"
+              className="btn-angled !bg-[#00e701] !text-black hover:!brightness-110"
             >
               Bet This Match on Stake ↗
             </a>
@@ -193,7 +193,7 @@ export default async function MatchPage({
           {match.preview && (
             <section>
               <h2 className="mb-3 flex items-center gap-2 text-xl font-black">
-                <span className="h-4 w-1 rounded-full bg-brand" /> Match Preview
+                <span className="section-bar" /> Match Preview
               </h2>
               <p className="text-sm leading-relaxed text-muted">{match.preview}</p>
             </section>
@@ -202,7 +202,7 @@ export default async function MatchPage({
           {(match.homeForm || match.awayForm || match.h2hNotes) && (
             <section id="analysis">
               <h2 className="mb-3 flex items-center gap-2 text-xl font-black">
-                <span className="h-4 w-1 rounded-full bg-brand" /> Form &amp; Head-to-Head
+                <span className="section-bar" /> Form &amp; Head-to-Head
               </h2>
               <div className="grid gap-4 sm:grid-cols-2">
                 {match.homeForm && (
@@ -221,7 +221,7 @@ export default async function MatchPage({
           {match.predictionFullAnalysis && (
             <section>
               <h2 className="mb-3 flex items-center gap-2 text-xl font-black">
-                <span className="h-4 w-1 rounded-full bg-gold" /> Full Analysis
+                <span className="section-bar" style={{ background: "linear-gradient(180deg, var(--gold), var(--gold-dark))" }} /> Full Analysis
               </h2>
               <div className="prose-fb">
                 {match.predictionFullAnalysis.split("\n").map((p, i) => (
@@ -247,7 +247,7 @@ export default async function MatchPage({
           {watchProviders.length > 0 && (
             <section>
               <h2 className="mb-3 flex items-center gap-2 text-xl font-black">
-                <span className="h-4 w-1 rounded-full bg-brand" /> Where to Watch
+                <span className="section-bar" /> Where to Watch
               </h2>
               <div className="space-y-2">
                 {watchProviders.map((p) => (
@@ -275,7 +275,7 @@ export default async function MatchPage({
           {relatedArticles.length > 0 && (
             <section>
               <h2 className="mb-3 flex items-center gap-2 text-xl font-black">
-                <span className="h-4 w-1 rounded-full bg-brand" /> Related News
+                <span className="section-bar" /> Related News
               </h2>
               <div className="grid gap-4 sm:grid-cols-2">
                 {relatedArticles.map((a) => (

@@ -38,9 +38,13 @@ export default async function HomePage() {
       {featured && tally && (
         <section className="mb-12">
           <div className="grid gap-4 lg:grid-cols-3">
-            <div className={`card overflow-hidden lg:col-span-2 ${featuredLive ? "live-border" : ""}`}>
-              <div className="accent-strip" />
-              <div className="p-6">
+            <div
+              className={`card pitch-texture relative overflow-hidden lg:col-span-2 ${
+                featuredLive ? "live-border" : "glow-gold"
+              }`}
+            >
+              <span className={`corner-wedge ${featuredLive ? "is-live" : ""}`} />
+              <div className="p-6 pt-8">
                 <div className="mb-5 flex items-center justify-between">
                   <span className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-gold">
                     <Flame size={13} /> {featured.competition?.name ?? "Match of the Day"}
@@ -97,23 +101,17 @@ export default async function HomePage() {
                 </div>
 
                 <div className="mt-6 flex flex-wrap gap-3">
-                  <Link
-                    href={`/match/${featured.slug}`}
-                    className="rounded-lg bg-brand px-5 py-2.5 text-sm font-bold text-black transition hover:bg-brand-dark"
-                  >
-                    PREDICT MATCH
+                  <Link href={`/match/${featured.slug}`} className="btn-angled">
+                    PREDICT MATCH <ArrowRight size={15} />
                   </Link>
-                  <Link
-                    href={`/match/${featured.slug}#analysis`}
-                    className="rounded-lg border border-border px-5 py-2.5 text-sm font-bold transition hover:border-brand"
-                  >
+                  <Link href={`/match/${featured.slug}#analysis`} className="btn-angled-outline">
                     READ ANALYSIS
                   </Link>
                   <a
                     href="https://stake.com/?c=bo4ixMU7"
                     target="_blank"
                     rel="noopener sponsored"
-                    className="flex items-center gap-1.5 rounded-lg border border-[#00e701]/60 bg-[#00e701]/10 px-5 py-2.5 text-sm font-bold text-[#00e701] transition hover:bg-[#00e701]/25 hover:border-[#00e701]"
+                    className="btn-angled !bg-[#00e701] !text-black hover:!brightness-110"
                   >
                     BET ON STAKE ↗
                   </a>
@@ -225,8 +223,8 @@ export default async function HomePage() {
 function SectionHeader({ title, href }: { title: string; href: string }) {
   return (
     <div className="mb-4 flex items-center justify-between border-b border-border pb-3">
-      <h2 className="flex items-center gap-2 text-xl font-black">
-        <span className="h-4 w-1 rounded-full bg-brand" /> {title}
+      <h2 className="flex items-center gap-2.5 text-xl font-black italic">
+        <span className="section-bar" /> {title}
       </h2>
       <Link
         href={href}

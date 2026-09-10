@@ -161,7 +161,7 @@ function VoteOption({
     <button
       onClick={onClick}
       disabled={disabled}
-      className={`flex flex-col items-center gap-1.5 rounded-lg border p-2 text-center transition disabled:cursor-not-allowed ${
+      className={`card-sm flex flex-col items-center gap-1.5 border bg-surface-2 p-2 text-center transition disabled:cursor-not-allowed ${
         selected ? selectedClass : "border-border hover:border-border-strong"
       }`}
     >

@@ -33,9 +33,7 @@ export function ArticleCard({ article, size = "default" }: { article: ArticleCar
             FB
           </div>
         )}
-        <span className="absolute left-2 top-2 rounded bg-black/70 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-brand">
-          {article.category}
-        </span>
+        <span className="tag tag-brand absolute left-2 top-2">{article.category}</span>
       </div>
       <div className="p-3.5">
         <h3
