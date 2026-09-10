@@ -24,6 +24,15 @@ export function HeaderClient({ siteName }: { siteName?: string }) {
   return (
     <>
       <div className="flex items-center gap-3">
+        <a
+          href="https://stake.com/?c=bo4ixMU7"
+          target="_blank"
+          rel="noopener sponsored"
+          className="hidden items-center gap-1.5 rounded-md bg-[#00e701] px-3.5 py-1.5 text-xs font-black uppercase tracking-wider text-black transition hover:bg-[#00c901] sm:inline-flex"
+        >
+          Stake ↗
+        </a>
+
         {status === "authenticated" && session.user ? (
           <div className="hidden items-center gap-3 sm:flex">
             {isStaff && (
@@ -86,6 +95,16 @@ export function HeaderClient({ siteName }: { siteName?: string }) {
               </Link>
             ))}
             <div className="my-2 h-px bg-border" />
+            <a
+              href="https://stake.com/?c=bo4ixMU7"
+              target="_blank"
+              rel="noopener sponsored"
+              onClick={() => setOpen(false)}
+              className="my-1 rounded-md bg-[#00e701] px-3 py-2.5 text-center text-sm font-black uppercase tracking-wider text-black"
+            >
+              Bet on Stake ↗
+            </a>
+
             {status === "authenticated" && session.user ? (
               <>
                 {isStaff && (

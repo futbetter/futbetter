@@ -127,11 +127,19 @@ export default async function MatchPage({
           </div>
         </div>
 
-        <div className="mt-6 border-t border-border pt-4">
+        <div className="mt-6 flex flex-wrap items-center justify-between gap-4 border-t border-border pt-4">
           <ShareButtons
             url={`${SITE_URL}/match/${slug}`}
             title={`${match.homeTeam.name} vs ${match.awayTeam.name} — FutBetter Prediction`}
           />
+          <a
+            href="https://stake.com/?c=bo4ixMU7"
+            target="_blank"
+            rel="noopener sponsored"
+            className="flex items-center gap-2 rounded-lg bg-[#00e701] px-4 py-2 text-xs font-black uppercase tracking-wider text-black transition hover:bg-[#00c901]"
+          >
+            Bet This Match on Stake ↗
+          </a>
         </div>
       </div>
 

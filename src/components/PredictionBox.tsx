@@ -108,6 +108,31 @@ export function PredictionBox({
           <p className="text-sm font-bold">{winnerLabel(expertWinner, homeTeamName, awayTeamName)}</p>
         </div>
       )}
+
+      <a
+        href="https://stake.com/?c=bo4ixMU7"
+        target="_blank"
+        rel="noopener sponsored"
+        className="group block rounded-xl border border-[#00e701]/30 bg-gradient-to-br from-surface to-surface-2 p-4 transition hover:border-[#00e701] hover:shadow-[0_0_20px_rgba(0,231,1,0.15)]"
+      >
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-[#00e701]">
+            <span className="flex h-5 w-5 items-center justify-center rounded bg-[#00e701] text-[11px] font-black text-black">
+              S
+            </span>
+            Official Betting Partner
+          </div>
+          <span className="text-xs font-bold text-[#00e701] transition-transform group-hover:translate-x-0.5">
+            Bet Now ↗
+          </span>
+        </div>
+        <p className="mt-2 text-sm font-bold">
+          Back your prediction on Stake
+        </p>
+        <p className="text-xs text-muted">
+          Best odds, live betting &amp; instant crypto/fiat payouts
+        </p>
+      </a>
     </div>
   );
 }

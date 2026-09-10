@@ -74,6 +74,14 @@ export default async function HomePage() {
                 >
                   READ ANALYSIS
                 </Link>
+                <a
+                  href="https://stake.com/?c=bo4ixMU7"
+                  target="_blank"
+                  rel="noopener sponsored"
+                  className="flex items-center gap-1.5 rounded-lg border border-[#00e701]/60 bg-[#00e701]/10 px-5 py-2.5 text-sm font-bold text-[#00e701] transition hover:bg-[#00e701]/25 hover:border-[#00e701]"
+                >
+                  BET ON STAKE ↗
+                </a>
               </div>
             </div>
 
