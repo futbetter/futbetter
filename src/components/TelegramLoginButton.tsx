@@ -26,16 +26,18 @@ export function TelegramLoginButton({ botUsername }: { botUsername: string }) {
     const container = containerRef.current;
 
     window.onFutBetterTelegramAuth = (user: TelegramUser) => {
-      signIn("telegram", {
+      const payload: Record<string, string> = {
         id: String(user.id),
-        first_name: user.first_name ?? "",
-        last_name: user.last_name ?? "",
-        username: user.username ?? "",
-        photo_url: user.photo_url ?? "",
         auth_date: String(user.auth_date),
         hash: user.hash,
         callbackUrl: "/",
-      });
+      };
+      if (user.first_name) payload.first_name = user.first_name;
+      if (user.last_name) payload.last_name = user.last_name;
+      if (user.username) payload.username = user.username;
+      if (user.photo_url) payload.photo_url = user.photo_url;
+
+      signIn("telegram", payload);
     };
 
     const script = document.createElement("script");

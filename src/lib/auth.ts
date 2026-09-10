@@ -65,10 +65,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         hash: { label: "hash", type: "text" },
       },
       async authorize(raw) {
+        if (!raw) return null;
         const data = raw as unknown as TelegramAuthData;
         if (!data?.id || !data?.hash || !data?.auth_date) return null;
 
-        const isValid = verifyTelegramAuth(data);
+        const isValid = verifyTelegramAuth(raw as unknown as Record<string, unknown>);
         if (!isValid) {
           console.error("[telegram] hash verification failed");
           return null;
@@ -81,37 +82,49 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           .where(eq(users.telegramId, telegramId))
           .limit(1);
 
+        const fullName = [data.first_name, data.last_name].filter(Boolean).join(" ");
+
         if (existing) {
           if (existing.banned) return null;
           // keep profile info fresh
           await db
             .update(users)
             .set({
-              name: [data.first_name, data.last_name].filter(Boolean).join(" ") || existing.name,
-              telegramUsername: data.username ?? existing.telegramUsername,
-              image: data.photo_url ?? existing.image,
+              name: fullName || existing.name,
+              telegramUsername: data.username || existing.telegramUsername,
+              image: data.photo_url || existing.image,
               updatedAt: new Date(),
             })
             .where(eq(users.id, existing.id));
 
           return {
             id: existing.id,
-            name: existing.name,
-            image: data.photo_url ?? existing.image,
+            name: fullName || existing.name,
+            image: data.photo_url || existing.image,
             role: existing.role,
             username: existing.username ?? undefined,
           };
         }
 
-        const baseUsername = data.username || `user${telegramId}`;
+        let chosenUsername = data.username || `user_${telegramId}`;
+        const [existingUserWithUsername] = await db
+          .select({ id: users.id })
+          .from(users)
+          .where(eq(users.username, chosenUsername))
+          .limit(1);
+
+        if (existingUserWithUsername) {
+          chosenUsername = `${chosenUsername}_${Math.floor(1000 + Math.random() * 9000)}`;
+        }
+
         const [created] = await db
           .insert(users)
           .values({
-            name: [data.first_name, data.last_name].filter(Boolean).join(" ") || baseUsername,
-            username: baseUsername,
+            name: fullName || chosenUsername,
+            username: chosenUsername,
             telegramId,
-            telegramUsername: data.username,
-            image: data.photo_url,
+            telegramUsername: data.username || null,
+            image: data.photo_url || null,
             role: "USER",
           })
           .returning();
