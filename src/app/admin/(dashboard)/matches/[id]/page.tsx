@@ -1,11 +1,25 @@
 import { notFound } from "next/navigation";
 import { Trash2 } from "lucide-react";
 import { db } from "@/lib/db";
-import { matches } from "@/lib/db/schema";
-import { eq } from "drizzle-orm";
+import { matches, matchEvents } from "@/lib/db/schema";
+import { eq, desc } from "drizzle-orm";
 import { MatchForm } from "@/components/admin/MatchForm";
 import { getTeams, getCompetitions, getWatchProviders } from "@/lib/queries";
-import { recordMatchResult, addWatchProvider, deleteWatchProvider } from "@/lib/actions/matches";
+import {
+  recordMatchResult,
+  addWatchProvider,
+  deleteWatchProvider,
+  addMatchEvent,
+  deleteMatchEvent,
+} from "@/lib/actions/matches";
+
+const EVENT_TYPE_LABELS: Record<string, string> = {
+  GOAL: "⚽ Goal",
+  PENALTY_GOAL: "⚽ Penalty",
+  OWN_GOAL: "⚽ Own goal",
+  RED_CARD: "🟥 Red card",
+  VAR: "📺 VAR",
+};
 
 export const metadata = { title: "Edit Match" };
 
@@ -18,11 +32,15 @@ export default async function EditMatchPage({
   const [match] = await db.select().from(matches).where(eq(matches.id, id)).limit(1);
   if (!match) notFound();
 
-  const [teams, competitions, providers] = await Promise.all([
+  const [teams, competitions, providers, events] = await Promise.all([
     getTeams(),
     getCompetitions(),
     getWatchProviders(id),
+    db.select().from(matchEvents).where(eq(matchEvents.matchId, id)).orderBy(desc(matchEvents.createdAt)),
   ]);
+
+  const homeTeamName = teams.find((t) => t.id === match.homeTeamId)?.name ?? "Home";
+  const awayTeamName = teams.find((t) => t.id === match.awayTeamId)?.name ?? "Away";
 
   return (
     <div className="space-y-8">
@@ -50,6 +68,55 @@ export default async function EditMatchPage({
           Recording a result marks the match as finished, locks voting, and evaluates every user&apos;s prediction accuracy.
           This only runs once per match — editing the score afterwards updates the display only.
         </p>
+      </fieldset>
+
+      <fieldset className="rounded-lg border border-border p-4">
+        <legend className="px-1 text-xs font-bold uppercase tracking-wider text-muted">Live Match Events</legend>
+        <p className="mb-3 text-xs text-muted">
+          Logging a goal here instantly updates the scoreboard, marks the match LIVE, and flashes a
+          &quot;GOAL!&quot; badge on the public site (the site polls for updates every ~20 seconds while a match is live).
+        </p>
+
+        <div className="mb-4 space-y-2">
+          {events.map((e) => (
+            <div key={e.id} className="flex items-center justify-between rounded-lg border border-border bg-surface px-3 py-2">
+              <div className="text-sm">
+                <span className="font-bold">{e.minute}&apos;</span>{" "}
+                <span>{EVENT_TYPE_LABELS[e.type] ?? e.type}</span>{" "}
+                <span className="text-muted">
+                  — {e.team === "HOME" ? homeTeamName : awayTeamName}
+                  {e.scorerName ? ` (${e.scorerName})` : ""} · now {e.homeScoreAfter}-{e.awayScoreAfter}
+                </span>
+              </div>
+              <form action={deleteMatchEvent.bind(null, e.id, match.id)}>
+                <button className="rounded-md p-1.5 text-red-400 hover:bg-surface-2" title="Remove event">
+                  <Trash2 size={15} />
+                </button>
+              </form>
+            </div>
+          ))}
+          {events.length === 0 && <p className="text-sm text-muted">No live events logged yet.</p>}
+        </div>
+
+        <form action={addMatchEvent} className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+          <input type="hidden" name="matchId" value={match.id} />
+          <select name="type" defaultValue="GOAL" className="input">
+            <option value="GOAL">⚽ Goal</option>
+            <option value="PENALTY_GOAL">⚽ Penalty scored</option>
+            <option value="OWN_GOAL">⚽ Own goal</option>
+            <option value="RED_CARD">🟥 Red card</option>
+            <option value="VAR">📺 VAR decision</option>
+          </select>
+          <select name="team" defaultValue="HOME" className="input" required>
+            <option value="HOME">{homeTeamName} (Home)</option>
+            <option value="AWAY">{awayTeamName} (Away)</option>
+          </select>
+          <input type="number" min={0} max={130} name="minute" placeholder="Minute" required className="input" />
+          <input name="scorerName" placeholder="Scorer / player (optional)" className="input" />
+          <button type="submit" className="rounded-lg bg-brand px-4 py-2.5 text-sm font-bold text-black hover:bg-brand-dark">
+            Log Event
+          </button>
+        </form>
       </fieldset>
 
       <fieldset className="rounded-lg border border-border p-4">

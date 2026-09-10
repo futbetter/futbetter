@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { getCompetitionBySlug, getMatchesForCompetition } from "@/lib/queries";
 import { MatchCard } from "@/components/MatchCard";
 import { TeamBadge } from "@/components/TeamBadge";
+import { LiveRefresher } from "@/components/LiveRefresher";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://futbetter.com";
 
@@ -33,10 +34,12 @@ export default async function CompetitionPage({
   const matches = await getMatchesForCompetition(competition.id);
   const upcoming = matches.filter((m) => m.status !== "FINISHED");
   const finished = matches.filter((m) => m.status === "FINISHED");
+  const hasLive = matches.some((m) => m.status === "LIVE");
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
-      <div className="mb-8 flex items-center gap-4 rounded-2xl border border-border bg-surface p-6">
+      <LiveRefresher active={hasLive} />
+      <div className="card mb-8 flex items-center gap-4 p-6">
         <TeamBadge name={competition.name} logoUrl={competition.logoUrl} size={64} />
         <div>
           <h1 className="text-2xl font-black">{competition.name}</h1>

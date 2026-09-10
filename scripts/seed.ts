@@ -8,6 +8,7 @@ import {
   matches,
   articles,
   watchProviders,
+  matchEvents,
   adSlots,
   partners,
   siteSettings,
@@ -142,7 +143,7 @@ async function main() {
     venue?: string;
     featured?: boolean;
     isMatchOfTheDay?: boolean;
-    status?: "SCHEDULED" | "FINISHED";
+    status?: "SCHEDULED" | "LIVE" | "FINISHED";
     homeScore?: number;
     awayScore?: number;
     prediction?: {
@@ -175,7 +176,7 @@ async function main() {
         isMatchOfTheDay: opts.isMatchOfTheDay ?? false,
         homeScore: opts.homeScore,
         awayScore: opts.awayScore,
-        votingLocked: opts.status === "FINISHED",
+        votingLocked: opts.status === "FINISHED" || opts.status === "LIVE",
         preview: opts.preview,
         homeForm: opts.homeForm,
         awayForm: opts.awayForm,
@@ -216,17 +217,33 @@ async function main() {
     },
   });
 
-  await upsertMatch({
+  // A LIVE demo match with goal events, so the "GOAL!" flash / live-timeline
+  // feature has something to show right after seeding.
+  const liveMatchId = await upsertMatch({
     home: "Manchester City",
     away: "Liverpool",
     competition: "Premier League",
-    kickoffAt: hours(6),
+    kickoffAt: hours(-0.75),
     venue: "Etihad Stadium",
+    status: "LIVE",
+    homeScore: 1,
+    awayScore: 1,
     homeForm: "WWWDL",
     awayForm: "WWWWD",
     preview: "A potential title-decider between two of the Premier League's form teams.",
     prediction: { winner: "DRAW", confidence: 41, scoreHome: 1, scoreAway: 1, reasoning: "Two evenly matched sides — expect a cagey, tactical affair.", keyFactors: ["Both teams unbeaten in their last 6", "City missing a key defender through injury"] },
   });
+
+  if (liveMatchId) {
+    const [existingEvents] = await db.select().from(matchEvents).where(eq(matchEvents.matchId, liveMatchId)).limit(1);
+    if (!existingEvents) {
+      await db.insert(matchEvents).values([
+        { matchId: liveMatchId, type: "GOAL", team: "HOME", minute: 23, scorerName: "E. Haaland", homeScoreAfter: 1, awayScoreAfter: 0 },
+        { matchId: liveMatchId, type: "GOAL", team: "AWAY", minute: 41, scorerName: "M. Salah", homeScoreAfter: 1, awayScoreAfter: 1 },
+      ]);
+      console.log("✔ Seeded live match events for Man City vs Liverpool");
+    }
+  }
 
   await upsertMatch({
     home: "Arsenal",

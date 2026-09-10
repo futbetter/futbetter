@@ -15,7 +15,12 @@ import { DEFAULT_PAGES } from "@/lib/default-pages";
 export async function getFeaturedMatch() {
   const [match] = await db.query.matches.findMany({
     where: and(eq(matches.featured, true), ne(matches.status, "FINISHED")),
-    with: { homeTeam: true, awayTeam: true, competition: true },
+    with: {
+      homeTeam: true,
+      awayTeam: true,
+      competition: true,
+      events: { orderBy: (events, { desc: d }) => [d(events.createdAt)] },
+    },
     orderBy: [asc(matches.kickoffAt)],
     limit: 1,
   });
@@ -24,7 +29,12 @@ export async function getFeaturedMatch() {
   // fall back to the soonest scheduled match
   const [fallback] = await db.query.matches.findMany({
     where: eq(matches.status, "SCHEDULED"),
-    with: { homeTeam: true, awayTeam: true, competition: true },
+    with: {
+      homeTeam: true,
+      awayTeam: true,
+      competition: true,
+      events: { orderBy: (events, { desc: d }) => [d(events.createdAt)] },
+    },
     orderBy: [asc(matches.kickoffAt)],
     limit: 1,
   });
@@ -37,7 +47,12 @@ export async function getUpcomingMatches(limit = 8, excludeId?: string) {
       or(eq(matches.status, "SCHEDULED"), eq(matches.status, "LIVE")),
       excludeId ? ne(matches.id, excludeId) : undefined
     ),
-    with: { homeTeam: true, awayTeam: true, competition: true },
+    with: {
+      homeTeam: true,
+      awayTeam: true,
+      competition: true,
+      events: { orderBy: (events, { desc: d }) => [d(events.createdAt)], limit: 1 },
+    },
     orderBy: [asc(matches.kickoffAt)],
     limit,
   });
@@ -46,7 +61,12 @@ export async function getUpcomingMatches(limit = 8, excludeId?: string) {
 export async function getRecentResults(limit = 8) {
   return db.query.matches.findMany({
     where: eq(matches.status, "FINISHED"),
-    with: { homeTeam: true, awayTeam: true, competition: true },
+    with: {
+      homeTeam: true,
+      awayTeam: true,
+      competition: true,
+      events: { orderBy: (events, { desc: d }) => [d(events.createdAt)], limit: 1 },
+    },
     orderBy: [desc(matches.kickoffAt)],
     limit,
   });
@@ -54,7 +74,12 @@ export async function getRecentResults(limit = 8) {
 
 export async function getAllMatches() {
   return db.query.matches.findMany({
-    with: { homeTeam: true, awayTeam: true, competition: true },
+    with: {
+      homeTeam: true,
+      awayTeam: true,
+      competition: true,
+      events: { orderBy: (events, { desc: d }) => [d(events.createdAt)], limit: 1 },
+    },
     orderBy: [asc(matches.kickoffAt)],
   });
 }
@@ -67,6 +92,7 @@ export async function getMatchBySlug(slug: string) {
       awayTeam: true,
       competition: true,
       watchProviders: true,
+      events: { orderBy: (events, { desc: d }) => [d(events.createdAt)] },
     },
   });
 }
@@ -157,7 +183,12 @@ export async function getCompetitionBySlug(slug: string) {
 export async function getMatchesForTeam(teamId: string) {
   return db.query.matches.findMany({
     where: or(eq(matches.homeTeamId, teamId), eq(matches.awayTeamId, teamId)),
-    with: { homeTeam: true, awayTeam: true, competition: true },
+    with: {
+      homeTeam: true,
+      awayTeam: true,
+      competition: true,
+      events: { orderBy: (events, { desc: d }) => [d(events.createdAt)], limit: 1 },
+    },
     orderBy: [desc(matches.kickoffAt)],
     limit: 20,
   });
@@ -166,7 +197,12 @@ export async function getMatchesForTeam(teamId: string) {
 export async function getMatchesForCompetition(competitionId: string) {
   return db.query.matches.findMany({
     where: eq(matches.competitionId, competitionId),
-    with: { homeTeam: true, awayTeam: true, competition: true },
+    with: {
+      homeTeam: true,
+      awayTeam: true,
+      competition: true,
+      events: { orderBy: (events, { desc: d }) => [d(events.createdAt)], limit: 1 },
+    },
     orderBy: [asc(matches.kickoffAt)],
   });
 }

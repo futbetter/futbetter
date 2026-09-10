@@ -104,7 +104,6 @@ export function HeaderClient({ siteName }: { siteName?: string }) {
             >
               Bet on Stake ↗
             </a>
-
             {status === "authenticated" && session.user ? (
               <>
                 {isStaff && (

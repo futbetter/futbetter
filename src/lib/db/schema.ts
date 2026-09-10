@@ -33,6 +33,16 @@ export const matchStatusEnum = pgEnum("match_status", [
 
 export const outcomeEnum = pgEnum("outcome", ["HOME", "DRAW", "AWAY"]);
 
+export const matchEventTypeEnum = pgEnum("match_event_type", [
+  "GOAL",
+  "PENALTY_GOAL",
+  "OWN_GOAL",
+  "RED_CARD",
+  "VAR",
+]);
+
+export const matchEventTeamEnum = pgEnum("match_event_team", ["HOME", "AWAY"]);
+
 export const articleTypeEnum = pgEnum("article_type", ["NEWS", "ANALYSIS"]);
 
 export const articleStatusEnum = pgEnum("article_status", [
@@ -180,6 +190,25 @@ export const matches = pgTable(
     index("matches_kickoff_idx").on(t.kickoffAt),
     index("matches_status_idx").on(t.status),
   ]
+);
+
+// ---------- MATCH EVENTS (live goals / cards) ----------
+export const matchEvents = pgTable(
+  "match_events",
+  {
+    id: text("id").primaryKey().default(sql`gen_random_uuid()`),
+    matchId: text("match_id")
+      .notNull()
+      .references(() => matches.id, { onDelete: "cascade" }),
+    type: matchEventTypeEnum("type").notNull().default("GOAL"),
+    team: matchEventTeamEnum("team").notNull(),
+    minute: integer("minute").notNull(),
+    scorerName: text("scorer_name"),
+    homeScoreAfter: integer("home_score_after").notNull(),
+    awayScoreAfter: integer("away_score_after").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("match_events_match_idx").on(t.matchId, t.createdAt)]
 );
 
 // ---------- VOTES ----------
@@ -410,6 +439,15 @@ export const matchesRelations = relations(matches, ({ one, many }) => ({
   competition: one(competitions, { fields: [matches.competitionId], references: [competitions.id] }),
   votes: many(votes),
   watchProviders: many(watchProviders),
+  events: many(matchEvents),
+}));
+
+export const matchEventsRelations = relations(matchEvents, ({ one }) => ({
+  match: one(matches, { fields: [matchEvents.matchId], references: [matches.id] }),
+}));
+
+export const watchProvidersRelations = relations(watchProviders, ({ one }) => ({
+  match: one(matches, { fields: [watchProviders.matchId], references: [matches.id] }),
 }));
 
 export const teamsRelations = relations(teams, ({ one }) => ({

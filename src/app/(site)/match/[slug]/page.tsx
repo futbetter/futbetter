@@ -12,10 +12,20 @@ import { TeamBadge } from "@/components/TeamBadge";
 import { VoteWidget } from "@/components/VoteWidget";
 import { PredictionBox } from "@/components/PredictionBox";
 import { Countdown } from "@/components/Countdown";
+import { LiveScore } from "@/components/LiveScore";
+import { LiveRefresher } from "@/components/LiveRefresher";
 import { ShareButtons } from "@/components/ShareButtons";
 import { ArticleCard } from "@/components/ArticleCard";
 import { AdSlot } from "@/components/AdSlot";
 import { formatKickoff, isVotingLocked } from "@/lib/utils";
+
+const EVENT_ICON: Record<string, string> = {
+  GOAL: "⚽",
+  PENALTY_GOAL: "⚽",
+  OWN_GOAL: "⚽ (OG)",
+  RED_CARD: "🟥",
+  VAR: "📺",
+};
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://futbetter.com";
 
@@ -56,6 +66,7 @@ export default async function MatchPage({
 
   const locked = isVotingLocked(match.votingLocked, match.kickoffAt);
   const finished = match.status === "FINISHED";
+  const live = match.status === "LIVE";
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -80,68 +91,100 @@ export default async function MatchPage({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
+      <LiveRefresher active={live} />
+
       <nav className="mb-4 text-xs text-muted">
         <Link href="/matches" className="hover:text-brand">Matches</Link> /{" "}
         <span>{match.homeTeam.name} vs {match.awayTeam.name}</span>
       </nav>
 
-      <div className="rounded-2xl border border-border bg-surface p-6">
-        <div className="mb-4 flex items-center justify-between text-xs font-bold uppercase tracking-widest text-brand">
-          <span>{match.competition?.name ?? "Football"}</span>
-          {finished ? (
-            <span className="text-muted">FULL TIME</span>
-          ) : match.status === "LIVE" ? (
-            <Countdown target={match.kickoffAt.toString()} live />
-          ) : (
-            <Countdown target={match.kickoffAt.toString()} />
-          )}
-        </div>
+      <div className={`card overflow-hidden ${live ? "live-border" : ""}`}>
+        <div className="accent-strip" />
+        <div className="p-6">
+          <div className="mb-4 flex items-center justify-between text-xs font-bold uppercase tracking-widest text-gold">
+            <span>{match.competition?.name ?? "Football"}</span>
+            {!live && !finished && <Countdown target={match.kickoffAt.toString()} />}
+          </div>
 
-        <div className="grid grid-cols-3 items-center gap-4">
-          <div className="flex flex-col items-center gap-3 text-center">
-            <TeamBadge name={match.homeTeam.name} logoUrl={match.homeTeam.logoUrl} color={match.homeTeam.primaryColor} size={80} />
-            <Link href={`/team/${match.homeTeam.slug}`} className="font-bold hover:text-brand">
-              {match.homeTeam.name}
-            </Link>
+          <div className="grid grid-cols-3 items-center gap-4">
+            <div className="flex flex-col items-center gap-3 text-center">
+              <TeamBadge name={match.homeTeam.name} logoUrl={match.homeTeam.logoUrl} color={match.homeTeam.primaryColor} size={80} />
+              <Link href={`/team/${match.homeTeam.slug}`} className="font-bold transition hover:text-brand">
+                {match.homeTeam.name}
+              </Link>
+            </div>
+            <div className="text-center">
+              {live || finished ? (
+                <LiveScore
+                  status={match.status}
+                  homeScore={match.homeScore}
+                  awayScore={match.awayScore}
+                  homeTeamName={match.homeTeam.name}
+                  awayTeamName={match.awayTeam.name}
+                  latestEvent={match.events?.[0] ?? null}
+                  size="lg"
+                />
+              ) : (
+                <span className="text-2xl font-black text-muted">vs</span>
+              )}
+              <p className="mt-2 text-sm font-semibold">{formatKickoff(new Date(match.kickoffAt))}</p>
+              {match.venue && (
+                <p className="mt-1 flex items-center justify-center gap-1 text-xs text-muted">
+                  <MapPin size={12} /> {match.venue}
+                </p>
+              )}
+            </div>
+            <div className="flex flex-col items-center gap-3 text-center">
+              <TeamBadge name={match.awayTeam.name} logoUrl={match.awayTeam.logoUrl} color={match.awayTeam.primaryColor} size={80} />
+              <Link href={`/team/${match.awayTeam.slug}`} className="font-bold transition hover:text-brand">
+                {match.awayTeam.name}
+              </Link>
+            </div>
           </div>
-          <div className="text-center">
-            {finished ? (
-              <span className="text-4xl font-black">
-                {match.homeScore} - {match.awayScore}
-              </span>
-            ) : (
-              <span className="text-2xl font-black text-muted">vs</span>
-            )}
-            <p className="mt-2 text-sm font-semibold">{formatKickoff(new Date(match.kickoffAt))}</p>
-            {match.venue && (
-              <p className="mt-1 flex items-center justify-center gap-1 text-xs text-muted">
-                <MapPin size={12} /> {match.venue}
-              </p>
-            )}
-          </div>
-          <div className="flex flex-col items-center gap-3 text-center">
-            <TeamBadge name={match.awayTeam.name} logoUrl={match.awayTeam.logoUrl} color={match.awayTeam.primaryColor} size={80} />
-            <Link href={`/team/${match.awayTeam.slug}`} className="font-bold hover:text-brand">
-              {match.awayTeam.name}
-            </Link>
-          </div>
-        </div>
 
-        <div className="mt-6 flex flex-wrap items-center justify-between gap-4 border-t border-border pt-4">
-          <ShareButtons
-            url={`${SITE_URL}/match/${slug}`}
-            title={`${match.homeTeam.name} vs ${match.awayTeam.name} — FutBetter Prediction`}
-          />
-          <a
-            href="https://stake.com/?c=bo4ixMU7"
-            target="_blank"
-            rel="noopener sponsored"
-            className="flex items-center gap-2 rounded-lg bg-[#00e701] px-4 py-2 text-xs font-black uppercase tracking-wider text-black transition hover:bg-[#00c901]"
-          >
-            Bet This Match on Stake ↗
-          </a>
+          <div className="mt-6 flex flex-wrap items-center justify-between gap-4 border-t border-border pt-4">
+            <ShareButtons
+              url={`${SITE_URL}/match/${slug}`}
+              title={`${match.homeTeam.name} vs ${match.awayTeam.name} — FutBetter Prediction`}
+            />
+            <a
+              href="https://stake.com/?c=bo4ixMU7"
+              target="_blank"
+              rel="noopener sponsored"
+              className="flex items-center gap-2 rounded-lg bg-[#00e701] px-4 py-2 text-xs font-black uppercase tracking-wider text-black transition hover:bg-[#00c901]"
+            >
+              Bet This Match on Stake ↗
+            </a>
+          </div>
         </div>
       </div>
+
+      {match.events && match.events.length > 0 && (
+        <section className="mt-6 card p-5">
+          <h2 className="mb-4 flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-muted">
+            {live && <span className="live-dot" />} Match Timeline
+          </h2>
+          <ol className="space-y-3">
+            {[...match.events]
+              .sort((a, b) => b.minute - a.minute)
+              .map((e) => (
+                <li key={e.id} className="flex items-center gap-3 text-sm">
+                  <span className="w-9 shrink-0 rounded-md bg-surface-2 py-1 text-center text-xs font-bold tabular-nums text-muted">
+                    {e.minute}&apos;
+                  </span>
+                  <span className="text-base leading-none">{EVENT_ICON[e.type] ?? "•"}</span>
+                  <span className="font-semibold">
+                    {e.team === "HOME" ? match.homeTeam.name : match.awayTeam.name}
+                  </span>
+                  {e.scorerName && <span className="text-muted">— {e.scorerName}</span>}
+                  <span className="ml-auto shrink-0 text-xs font-bold tabular-nums text-muted">
+                    {e.homeScoreAfter}-{e.awayScoreAfter}
+                  </span>
+                </li>
+              ))}
+          </ol>
+        </section>
+      )}
 
       <AdSlot code="AD_MATCH_TOP" className="my-8" />
 
@@ -149,14 +192,18 @@ export default async function MatchPage({
         <div className="space-y-8 lg:col-span-2">
           {match.preview && (
             <section>
-              <h2 className="mb-3 text-xl font-black">Match Preview</h2>
+              <h2 className="mb-3 flex items-center gap-2 text-xl font-black">
+                <span className="h-4 w-1 rounded-full bg-brand" /> Match Preview
+              </h2>
               <p className="text-sm leading-relaxed text-muted">{match.preview}</p>
             </section>
           )}
 
           {(match.homeForm || match.awayForm || match.h2hNotes) && (
             <section id="analysis">
-              <h2 className="mb-3 text-xl font-black">Form &amp; Head-to-Head</h2>
+              <h2 className="mb-3 flex items-center gap-2 text-xl font-black">
+                <span className="h-4 w-1 rounded-full bg-brand" /> Form &amp; Head-to-Head
+              </h2>
               <div className="grid gap-4 sm:grid-cols-2">
                 {match.homeForm && (
                   <FormCard label={match.homeTeam.name} form={match.homeForm} />
@@ -173,7 +220,9 @@ export default async function MatchPage({
 
           {match.predictionFullAnalysis && (
             <section>
-              <h2 className="mb-3 text-xl font-black">Full Analysis</h2>
+              <h2 className="mb-3 flex items-center gap-2 text-xl font-black">
+                <span className="h-4 w-1 rounded-full bg-gold" /> Full Analysis
+              </h2>
               <div className="prose-fb">
                 {match.predictionFullAnalysis.split("\n").map((p, i) => (
                   <p key={i}>{p}</p>
@@ -197,7 +246,9 @@ export default async function MatchPage({
 
           {watchProviders.length > 0 && (
             <section>
-              <h2 className="mb-3 text-xl font-black">Where to Watch</h2>
+              <h2 className="mb-3 flex items-center gap-2 text-xl font-black">
+                <span className="h-4 w-1 rounded-full bg-brand" /> Where to Watch
+              </h2>
               <div className="space-y-2">
                 {watchProviders.map((p) => (
                   <a
@@ -205,7 +256,7 @@ export default async function MatchPage({
                     href={p.url}
                     target="_blank"
                     rel="noreferrer sponsored"
-                    className="flex items-center justify-between rounded-lg border border-border bg-surface p-3 hover:border-brand/50"
+                    className="card card-hover flex items-center justify-between p-3"
                   >
                     <div>
                       <p className="font-semibold">{p.providerName}</p>
@@ -223,7 +274,9 @@ export default async function MatchPage({
 
           {relatedArticles.length > 0 && (
             <section>
-              <h2 className="mb-3 text-xl font-black">Related News</h2>
+              <h2 className="mb-3 flex items-center gap-2 text-xl font-black">
+                <span className="h-4 w-1 rounded-full bg-brand" /> Related News
+              </h2>
               <div className="grid gap-4 sm:grid-cols-2">
                 {relatedArticles.map((a) => (
                   <ArticleCard key={a.id} article={{ ...a, publishAt: a.publishAt?.toString() }} />
@@ -264,14 +317,14 @@ export default async function MatchPage({
 
 function FormCard({ label, form }: { label: string; form: string }) {
   return (
-    <div className="rounded-lg border border-border bg-surface p-3">
+    <div className="card p-3">
       <p className="mb-2 text-xs font-bold uppercase tracking-wider text-muted">{label} — Last 5</p>
       <div className="flex gap-1.5">
         {form.split("").map((c, i) => (
           <span
             key={i}
             className={`flex h-6 w-6 items-center justify-center rounded text-[10px] font-bold ${
-              c === "W" ? "bg-brand text-black" : c === "D" ? "bg-zinc-600 text-white" : "bg-red-500/80 text-white"
+              c === "W" ? "bg-brand text-black" : c === "D" ? "bg-accent-draw text-black" : "bg-live text-white"
             }`}
           >
             {c}
@@ -284,7 +337,7 @@ function FormCard({ label, form }: { label: string; form: string }) {
 
 function InfoList({ icon, title, items }: { icon: React.ReactNode; title: string; items: string[] }) {
   return (
-    <div className="rounded-lg border border-border bg-surface p-3">
+    <div className="card p-3">
       <p className="mb-2 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-muted">
         {icon} {title}
       </p>

@@ -1,14 +1,28 @@
 @import "tailwindcss";
 
 :root {
-  --background: #0b0d0c;
+  --background: #06070a;
+  --surface: #101318;
+  --surface-2: #171b22;
+  --surface-raised: #1c212a;
+  --border: #262c36;
+  --border-strong: #333b48;
   --foreground: #f4f6f5;
-  --surface: #14161a;
-  --surface-2: #1b1e23;
-  --border: #262a30;
+  --muted: #8b93a1;
+  --muted-2: #5c6472;
+
   --brand: #22c55e;
   --brand-dark: #16a34a;
-  --muted: #9aa0a6;
+  --brand-soft: rgba(34, 197, 94, 0.12);
+
+  --gold: #f5b93d;
+  --gold-dark: #d99b1f;
+
+  --live: #ef4444;
+  --live-soft: rgba(239, 68, 68, 0.14);
+
+  --accent-away: #3b9eff;
+  --accent-draw: #a1a8b3;
 }
 
 @theme inline {
@@ -16,10 +30,18 @@
   --color-foreground: var(--foreground);
   --color-surface: var(--surface);
   --color-surface-2: var(--surface-2);
+  --color-surface-raised: var(--surface-raised);
   --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
   --color-brand: var(--brand);
   --color-brand-dark: var(--brand-dark);
+  --color-gold: var(--gold);
+  --color-gold-dark: var(--gold-dark);
+  --color-live: var(--live);
+  --color-accent-away: var(--accent-away);
+  --color-accent-draw: var(--accent-draw);
   --color-muted: var(--muted);
+  --color-muted-2: var(--muted-2);
   --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 }
@@ -33,9 +55,14 @@ html {
 }
 
 body {
-  background: var(--background);
+  background:
+    radial-gradient(1200px 520px at 12% -10%, rgba(34, 197, 94, 0.10), transparent 60%),
+    radial-gradient(900px 480px at 100% 0%, rgba(245, 185, 61, 0.06), transparent 55%),
+    var(--background);
+  background-attachment: fixed;
   color: var(--foreground);
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+  font-variant-numeric: tabular-nums;
 }
 
 ::selection {
@@ -90,6 +117,93 @@ a {
 }
 .scrollbar-none {
   scrollbar-width: none;
+}
+
+/* ---------- Shared surfaces ---------- */
+.card {
+  position: relative;
+  border-radius: 1rem;
+  border: 1px solid var(--border);
+  background: linear-gradient(180deg, var(--surface-raised), var(--surface));
+}
+
+.card-hover {
+  transition: border-color 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
+}
+.card-hover:hover {
+  border-color: var(--border-strong);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px -18px rgba(0, 0, 0, 0.6);
+}
+
+/* Thin gradient accent strip used at the top of hero / featured cards */
+.accent-strip {
+  height: 3px;
+  background: linear-gradient(90deg, var(--brand), var(--gold));
+  border-radius: 999px 999px 0 0;
+}
+
+/* ---------- Live state ---------- */
+.live-dot {
+  position: relative;
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: var(--live);
+}
+.live-dot::after {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border-radius: 999px;
+  background: var(--live);
+  opacity: 0.55;
+  animation: liveRing 1.6s ease-out infinite;
+}
+@keyframes liveRing {
+  0% {
+    transform: scale(0.6);
+    opacity: 0.55;
+  }
+  100% {
+    transform: scale(2.1);
+    opacity: 0;
+  }
+}
+
+.live-border {
+  box-shadow: 0 0 0 1px var(--live-soft), 0 0 0 1px var(--live) inset;
+}
+
+/* Score / badge flashes green→transparent for ~2.5s when a goal lands */
+.goal-flash {
+  animation: goalFlash 2.4s ease-out;
+}
+@keyframes goalFlash {
+  0% {
+    background-color: var(--brand-soft);
+    box-shadow: 0 0 0 1px var(--brand);
+  }
+  100% {
+    background-color: transparent;
+    box-shadow: 0 0 0 1px transparent;
+  }
+}
+
+.goal-pop {
+  animation: goalPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes goalPop {
+  0% {
+    transform: scale(1);
+  }
+  35% {
+    transform: scale(1.28);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 
 /* Shared form control style used across the admin panel */

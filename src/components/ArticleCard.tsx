@@ -17,7 +17,7 @@ export function ArticleCard({ article, size = "default" }: { article: ArticleCar
   const date = article.publishAt ?? article.createdAt;
 
   return (
-    <Link href={href} className="group block overflow-hidden rounded-xl border border-border bg-surface">
+    <Link href={href} className="card card-hover group block overflow-hidden">
       <div
         className={`relative w-full overflow-hidden bg-surface-2 ${size === "large" ? "aspect-[16/9]" : "aspect-[16/10]"}`}
       >
@@ -29,7 +29,7 @@ export function ArticleCard({ article, size = "default" }: { article: ArticleCar
             className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center text-4xl font-black text-border">
+          <div className="flex h-full w-full items-center justify-center text-4xl font-black text-border-strong">
             FB
           </div>
         )}
@@ -39,7 +39,7 @@ export function ArticleCard({ article, size = "default" }: { article: ArticleCar
       </div>
       <div className="p-3.5">
         <h3
-          className={`font-bold leading-snug group-hover:text-brand ${
+          className={`font-bold leading-snug transition group-hover:text-brand ${
             size === "large" ? "text-lg" : "text-sm"
           }`}
         >

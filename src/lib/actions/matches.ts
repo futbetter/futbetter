@@ -1,7 +1,7 @@
 "use server";
 
 import { db } from "@/lib/db";
-import { matches, votes, users, predictionOutcomes, watchProviders, teams } from "@/lib/db/schema";
+import { matches, votes, users, predictionOutcomes, watchProviders, teams, matchEvents } from "@/lib/db/schema";
 import { requireStaff } from "@/lib/auth-guards";
 import { logAudit } from "@/lib/audit";
 import { matchSlug } from "@/lib/utils";
@@ -179,6 +179,83 @@ export async function recordMatchResult(formData: FormData) {
   revalidatePath(`/match/${match.slug}`);
   revalidatePath("/admin/matches");
   revalidatePath(`/admin/matches/${id}`);
+}
+
+/**
+ * Logs a live match event (goal, card, VAR call). For GOAL / PENALTY_GOAL /
+ * OWN_GOAL types it also bumps the match's live score, marks the match LIVE
+ * if it wasn't already, and stamps `updatedAt` so the public site's
+ * short-poll refresh (see LiveRefresher) picks up the change on its next
+ * request without needing a real-time transport.
+ */
+export async function addMatchEvent(formData: FormData) {
+  const user = await requireStaff();
+  const matchId = str(formData, "matchId");
+  const type =
+    (str(formData, "type") as
+      | "GOAL"
+      | "PENALTY_GOAL"
+      | "OWN_GOAL"
+      | "RED_CARD"
+      | "VAR"
+      | undefined) ?? "GOAL";
+  const team = str(formData, "team") as "HOME" | "AWAY" | undefined;
+  const minute = num(formData, "minute");
+  if (!matchId || !team || minute === undefined) {
+    throw new Error("Team and minute are required");
+  }
+
+  const [match] = await db.select().from(matches).where(eq(matches.id, matchId)).limit(1);
+  if (!match) throw new Error("Match not found");
+
+  const isGoal = type === "GOAL" || type === "PENALTY_GOAL" || type === "OWN_GOAL";
+  // An own goal counts for the *other* side on the scoreboard.
+  const scoringSide = type === "OWN_GOAL" ? (team === "HOME" ? "AWAY" : "HOME") : team;
+
+  const homeScoreAfter = (match.homeScore ?? 0) + (isGoal && scoringSide === "HOME" ? 1 : 0);
+  const awayScoreAfter = (match.awayScore ?? 0) + (isGoal && scoringSide === "AWAY" ? 1 : 0);
+
+  await db.insert(matchEvents).values({
+    matchId,
+    type,
+    team,
+    minute,
+    scorerName: str(formData, "scorerName") ?? null,
+    homeScoreAfter,
+    awayScoreAfter,
+  });
+
+  if (isGoal) {
+    await db
+      .update(matches)
+      .set({
+        homeScore: homeScoreAfter,
+        awayScore: awayScoreAfter,
+        status: match.status === "FINISHED" ? match.status : "LIVE",
+        updatedAt: new Date(),
+      })
+      .where(eq(matches.id, matchId));
+  }
+
+  await logAudit({
+    adminId: user.id,
+    adminName: user.name,
+    action: "ADD_MATCH_EVENT",
+    entityType: "match",
+    entityId: matchId,
+    details: { type, team, minute },
+  });
+
+  revalidatePath("/");
+  revalidatePath("/matches");
+  revalidatePath(`/match/${match.slug}`);
+  revalidatePath(`/admin/matches/${matchId}`);
+}
+
+export async function deleteMatchEvent(id: string, matchId: string) {
+  await requireStaff();
+  await db.delete(matchEvents).where(eq(matchEvents.id, id));
+  revalidatePath(`/admin/matches/${matchId}`);
 }
 
 export async function addWatchProvider(formData: FormData) {

@@ -75,7 +75,7 @@ export default async function AdvertisePage() {
         <h2 className="mb-4 text-lg font-bold">Our Audience</h2>
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
           {stats.map((s) => (
-            <div key={s.label} className="rounded-xl border border-border bg-surface p-4 text-center">
+            <div key={s.label} className="card p-4 text-center">
               <p className="text-2xl font-black text-brand">{formatNumber(s.value)}</p>
               <p className="mt-1 text-[11px] text-muted">{s.label}</p>
             </div>
@@ -92,7 +92,7 @@ export default async function AdvertisePage() {
         <h2 className="mb-4 text-lg font-bold">Advertising Formats</h2>
         <div className="grid gap-2 sm:grid-cols-2">
           {FORMATS.map((f) => (
-            <div key={f} className="rounded-lg border border-border bg-surface px-4 py-3 text-sm">
+            <div key={f} className="card px-4 py-3 text-sm">
               {f}
             </div>
           ))}

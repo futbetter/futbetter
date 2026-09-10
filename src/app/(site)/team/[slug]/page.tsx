@@ -6,6 +6,7 @@ import { getTeamBySlug, getMatchesForTeam, getArticles } from "@/lib/queries";
 import { TeamBadge } from "@/components/TeamBadge";
 import { MatchCard } from "@/components/MatchCard";
 import { ArticleCard } from "@/components/ArticleCard";
+import { LiveRefresher } from "@/components/LiveRefresher";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://futbetter.com";
 
@@ -38,10 +39,12 @@ export default async function TeamPage({
   const results = matches.filter((m) => m.status === "FINISHED").slice(0, 6);
   const news = await getArticles({ limit: 4 });
   const relatedNews = news.filter((a) => a.relatedTeamId === team.id);
+  const hasLive = matches.some((m) => m.status === "LIVE");
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
-      <div className="mb-8 flex items-center gap-4 rounded-2xl border border-border bg-surface p-6">
+      <LiveRefresher active={hasLive} />
+      <div className="card mb-8 flex items-center gap-4 p-6">
         <TeamBadge name={team.name} logoUrl={team.logoUrl} color={team.primaryColor} size={72} />
         <div>
           <h1 className="text-2xl font-black">{team.name}</h1>

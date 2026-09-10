@@ -142,7 +142,11 @@ login). Depending on your role you'll see:
   prediction box.
 - **Matches** — create matches, attach editorial predictions, expert
   predictions, H2H notes, form, key players/injuries, watch-link
-  providers; mark results to auto-evaluate community predictions.
+  providers; mark results to auto-evaluate community predictions; log
+  **live match events** (goals, penalties, own goals, red cards, VAR
+  calls) — logging a goal instantly updates the scoreboard, flips the
+  match to LIVE, and appears as a "⚽ GOAL!" flash and a running match
+  timeline on the public site within ~20 seconds (see section 11 below).
 - **Teams / Competitions** — manage the team & league database, including
   logo URLs and brand colors.
 - **Ads** — the full `AD_SLOT_*` inventory (home/article/match placements),
@@ -198,7 +202,9 @@ the full Super Admin panel described above (ads, partners, affiliate
 tracking tables, roles, audit log), `/advertise` page with editable stats,
 comments + moderation + reports data model, SEO (metadata, JSON-LD,
 sitemap, robots.txt, canonical URLs), Telegram Login, staff credential
-login, mobile-responsive public site and admin.
+login, mobile-responsive public site and admin, admin-driven live match
+events (goals/cards) with a real-time-feeling scoreboard flash and match
+timeline on the public site (see section 11).
 
 **Scaffolded in the data model but not yet built as UI:** live public
 comment form/thread display on articles and match pages (moderation
@@ -208,7 +214,27 @@ integration, 2FA. These were flagged in the original spec as things that
 can be added incrementally after launch — the schema and admin scaffolding
 were built to make each of these additive rather than requiring a rework.
 
-## 11. Security notes
+## 11. Live goals, without a live-data subscription
+
+FutBetter doesn't yet pull scores from a football-data API (see section 10),
+so live updates are admin-driven and lightweight by design:
+
+- In **Admin → Matches → (a match) → Live Match Events**, log a goal (team,
+  minute, scorer). This updates the match's score, flips its status to
+  `LIVE` if needed, and records the event.
+- The public site (home page, match cards, and the match detail page) polls
+  for fresh data roughly every 20 seconds *only while a page is showing a
+  LIVE match* (see `src/components/LiveRefresher.tsx`) — no websockets or
+  extra infrastructure required.
+- When a new goal event arrives, the scoreline flashes green and a
+  "⚽ GOAL! Team 67'" toast appears briefly (`src/components/LiveScore.tsx`),
+  and the match page shows a full minute-by-minute timeline.
+- This is intentionally swappable: if you later integrate a live-scores API
+  (section 10), you'd feed the same `matchEvents` table / `addMatchEvent`
+  action from a webhook or polling job instead of a human, and everything
+  downstream keeps working unchanged.
+
+## 12. Security notes
 
 - No secrets are hardcoded anywhere in the codebase — everything sensitive
   comes from environment variables.

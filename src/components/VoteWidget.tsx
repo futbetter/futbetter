@@ -17,8 +17,14 @@ interface VoteWidgetProps {
 
 const BAR_COLORS: Record<Choice, string> = {
   HOME: "bg-brand",
-  DRAW: "bg-zinc-500",
-  AWAY: "bg-sky-500",
+  DRAW: "bg-accent-draw",
+  AWAY: "bg-accent-away",
+};
+
+const BORDER_COLORS: Record<Choice, string> = {
+  HOME: "border-brand bg-brand/10",
+  DRAW: "border-accent-draw bg-accent-draw/10",
+  AWAY: "border-accent-away bg-accent-away/10",
 };
 
 export function VoteWidget({
@@ -58,7 +64,7 @@ export function VoteWidget({
   }
 
   return (
-    <div className="rounded-xl border border-border bg-surface p-4">
+    <div className="card p-4">
       {!compact && (
         <p className="mb-3 text-xs font-bold uppercase tracking-wider text-muted">
           Who will win?
@@ -76,6 +82,7 @@ export function VoteWidget({
           disabled={locked || isPending}
           onClick={() => vote("HOME")}
           barColor={BAR_COLORS.HOME}
+          selectedClass={BORDER_COLORS.HOME}
         />
         <VoteOption
           label="Draw"
@@ -85,6 +92,7 @@ export function VoteWidget({
           disabled={locked || isPending}
           onClick={() => vote("DRAW")}
           barColor={BAR_COLORS.DRAW}
+          selectedClass={BORDER_COLORS.DRAW}
           isDraw
         />
         <VoteOption
@@ -97,6 +105,7 @@ export function VoteWidget({
           disabled={locked || isPending}
           onClick={() => vote("AWAY")}
           barColor={BAR_COLORS.AWAY}
+          selectedClass={BORDER_COLORS.AWAY}
         />
       </div>
 
@@ -133,6 +142,7 @@ function VoteOption({
   disabled,
   onClick,
   barColor,
+  selectedClass,
   isDraw,
 }: {
   label: string;
@@ -144,6 +154,7 @@ function VoteOption({
   disabled?: boolean;
   onClick: () => void;
   barColor: string;
+  selectedClass: string;
   isDraw?: boolean;
 }) {
   return (
@@ -151,7 +162,7 @@ function VoteOption({
       onClick={onClick}
       disabled={disabled}
       className={`flex flex-col items-center gap-1.5 rounded-lg border p-2 text-center transition disabled:cursor-not-allowed ${
-        selected ? "border-brand bg-brand/10" : "border-border hover:border-brand/50"
+        selected ? selectedClass : "border-border hover:border-border-strong"
       }`}
     >
       {isDraw ? (

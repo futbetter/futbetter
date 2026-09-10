@@ -40,7 +40,7 @@ function ContactRow({ icon, label, href }: { icon: React.ReactNode; label: strin
       href={href}
       target={href.startsWith("http") ? "_blank" : undefined}
       rel="noreferrer"
-      className="flex items-center gap-3 rounded-lg border border-border bg-surface p-4 hover:border-brand/50"
+      className="card card-hover flex items-center gap-3 p-4"
     >
       <span className="text-brand">{icon}</span>
       <span className="font-medium">{label}</span>

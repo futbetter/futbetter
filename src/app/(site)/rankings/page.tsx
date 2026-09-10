@@ -29,7 +29,7 @@ export default async function RankingsPage() {
               <li key={u.id}>
                 <Link
                   href={`/profile/${u.username ?? u.id}`}
-                  className="flex items-center justify-between rounded-lg border border-border bg-surface px-3 py-2.5 hover:border-brand/50"
+                  className="card card-hover flex items-center justify-between px-3 py-2.5"
                 >
                   <span className="flex items-center gap-3">
                     <span className="w-5 text-center font-black text-muted">{i + 1}</span>
@@ -54,7 +54,7 @@ export default async function RankingsPage() {
               <li key={u.id}>
                 <Link
                   href={`/profile/${u.username ?? u.id}`}
-                  className="flex items-center justify-between rounded-lg border border-border bg-surface px-3 py-2.5 hover:border-brand/50"
+                  className="card card-hover flex items-center justify-between px-3 py-2.5"
                 >
                   <span className="flex items-center gap-3">
                     <span className="w-5 text-center font-black text-muted">{i + 1}</span>
