@@ -24,15 +24,6 @@ export function HeaderClient({ siteName }: { siteName?: string }) {
   return (
     <>
       <div className="flex items-center gap-3">
-        <a
-          href="https://stake.com/?c=bo4ixMU7"
-          target="_blank"
-          rel="noopener sponsored"
-          className="btn-angled-primary hidden !py-1.5 !text-xs !bg-[#00e701] !text-black hover:!brightness-110 sm:inline-flex"
-        >
-          STAKE ↗
-        </a>
-
         {status === "authenticated" && session.user ? (
           <div className="hidden items-center gap-3 sm:flex">
             {isStaff && (
