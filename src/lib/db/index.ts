@@ -14,18 +14,25 @@ if (!connectionString) {
   );
 }
 
-// Reuse the pool across hot-reloads in dev to avoid exhausting connections.
+// Automatically use transaction pooler (port 6543) if port 5432 is configured on Supabase pooler,
+// preventing EMAXCONNSESSION (the 15-connection limit in session mode).
+let normalizedConnectionString = connectionString;
+if (normalizedConnectionString && normalizedConnectionString.includes("pooler.supabase.com:5432")) {
+  normalizedConnectionString = normalizedConnectionString.replace(":5432/", ":6543/");
+}
+
+// Reuse the pool across requests/hot-reloads to avoid exhausting connections.
 const pool =
   global.__futbetterPool ??
   new Pool({
-    connectionString,
-    ssl: connectionString?.includes("localhost") ? false : { rejectUnauthorized: false },
-    max: 10,
+    connectionString: normalizedConnectionString,
+    ssl: normalizedConnectionString?.includes("localhost") ? false : { rejectUnauthorized: false },
+    max: 5,
+    idleTimeoutMillis: 10000,
+    connectionTimeoutMillis: 5000,
   });
 
-if (process.env.NODE_ENV !== "production") {
-  global.__futbetterPool = pool;
-}
+global.__futbetterPool = pool;
 
 export const db = drizzle(pool, { schema });
 export { pool };
