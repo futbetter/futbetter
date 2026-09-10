@@ -1,0 +1,111 @@
+@import "tailwindcss";
+
+:root {
+  --background: #0b0d0c;
+  --foreground: #f4f6f5;
+  --surface: #14161a;
+  --surface-2: #1b1e23;
+  --border: #262a30;
+  --brand: #22c55e;
+  --brand-dark: #16a34a;
+  --muted: #9aa0a6;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-border: var(--border);
+  --color-brand: var(--brand);
+  --color-brand-dark: var(--brand-dark);
+  --color-muted: var(--muted);
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+* {
+  border-color: var(--border);
+}
+
+html {
+  color-scheme: dark;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+}
+
+::selection {
+  background: var(--brand);
+  color: #06120a;
+}
+
+a {
+  color: inherit;
+}
+
+.prose-fb {
+  color: var(--foreground);
+  line-height: 1.75;
+}
+.prose-fb h2 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin-top: 1.75rem;
+  margin-bottom: 0.75rem;
+}
+.prose-fb h3 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+.prose-fb p {
+  margin-bottom: 1rem;
+  color: var(--muted);
+}
+.prose-fb a {
+  color: var(--brand);
+  text-decoration: underline;
+}
+.prose-fb ul {
+  list-style: disc;
+  padding-left: 1.5rem;
+  margin-bottom: 1rem;
+  color: var(--muted);
+}
+.prose-fb strong {
+  color: var(--foreground);
+}
+.prose-fb img {
+  border-radius: 0.75rem;
+  margin: 1rem 0;
+}
+
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-none {
+  scrollbar-width: none;
+}
+
+/* Shared form control style used across the admin panel */
+.input {
+  width: 100%;
+  border-radius: 0.5rem;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  padding: 0.625rem 0.75rem;
+  font-size: 0.875rem;
+  outline: none;
+  color: var(--foreground);
+}
+.input:focus {
+  border-color: var(--brand);
+}
+.input::placeholder {
+  color: var(--muted);
+}
